@@ -10,8 +10,8 @@ import math
 #from FTRL_lin import FTRL
 from norm_grad import norm_Grad
 from norm_OGD import norm_OGD
-from KT import KT
-from pf import parameterfree
+#from KT import KT
+#from pf import parameterfree
 from FTLR_prob import FTRL
 # Test function import
 from  Test_Functions import *
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     path_weird_2 = run_optimization(xy_init,function_test,  norm_Grad, n_iter)
     # OGD
     path_weird_3 = run_optimization(xy_init, function_test,norm_OGD, n_iter , alpha = 1/np.sqrt(n_iter))
-    path_weird_pf = run_optimization(xy_init,function_test, parameterfree, n_iter )
+    #path_weird_pf = run_optimization(xy_init,function_test, parameterfree, n_iter )
     
     freq = 10
 
@@ -168,5 +168,5 @@ if __name__ == "__main__":
     print("WWWW")
     print(path_weird_2[-15:])
     print(path_weird[-15:])
-    print(path_weird_pf[-15:])
+    #print(path_weird_pf[-15:])
     #print(path_weird_kt[-15:])
