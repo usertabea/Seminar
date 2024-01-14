@@ -12,14 +12,13 @@ import getopt, sys
 import scipy.optimize
 import scipy.stats
 
+# import of optimzer classes
 from nKT import nKT
 from nAda_Grad import nAda_Grad
 from nOGD import nOGD
 from nFTRL import nFTRL
 from OGD import OGD
 from Ada_Grad import Ada_Grad
-from KT import KT
-from hyper_OGD import OGD_hyper
 from lFTRL import FTRL
 # Test function import
 from  Test_Functions import *
@@ -97,7 +96,7 @@ def compare(optimzer_list, dim = 10,  n_iter = 500, tol = 0.01, **optimizer_kwar
     # show the plot
     ax = plt.gca()
     #ax.set_xlim([-0.1, 200])
-    #ax.set_ylim([0., 1.])
+    ax.set_ylim([0., 1.])
     plt.legend()
     plt.show()   
     plt.savefig(filename)
@@ -141,14 +140,13 @@ def run_optimization(optimizer_, dim = 2, n_iter = 100, tol = 0.01, lr = 1., **o
             break
         path[t, :] = xy_t.detach().numpy().flatten()
     print(optimizer_, abs_tol)   
-    #plt.plot(inputs, results, label=optimizer_)
+    plt.plot(inputs, results, label=optimizer_)
     # show the plot
-    #ax = plt.gca()
+    ax = plt.gca()
     # just interesting part      
-    
-    #ax.set_ylim([0., 1.])
-    #plt.legend()
-    #plt.show()
+    ax.set_ylim([0., 1.])
+    plt.legend()
+    plt.show()
     return A_, c_, xy_init_, path
     
    
