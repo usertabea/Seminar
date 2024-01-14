@@ -203,36 +203,38 @@ if __name__ == "__main__":
 
     num_optimzers = len(temp_input)
     # compares normalized with simple version of the algorithm
-    #compare(["OGD", "nOGD"])
-    #compare(["FTRL", "nFTRL"])
-    #compare(["nKT"])
-    #compare(["Ada_Grad", "nAda_Grad"])
-    
-    A_, c_, xy_, path_KT = run_optimization("nKT")
-    
-    _, _, _ ,path_nOGD = run_optimization("nOGD")
-    _, _, _ ,path_OGD = run_optimization("OGD")
-    _, _, _ ,path_nFTRL = run_optimization("nFTRL")
-    _, _, _ ,path_FTRL = run_optimization("FTRL")
-    _, _, _ ,path_Ada = run_optimization("Ada_Grad")
-    _, _, _ ,path_nAda = run_optimization("nAda_Grad")
-    freq = 1
-
-    paths = [path_nOGD[::freq], path_KT[::freq],path_OGD[::freq], path_nFTRL[::freq], path_FTRL[::freq], path_nAda[::freq], path_Ada[::freq]]
-    #print(path_nOGD)
-    colors = ["green", "royalblue", "black", "lightcoral", "purple", "red", "pink"]
-    names = ["nOGD", "nKT", "OGD", "nFTRL", "FTRL", "nAda", "Ada"] 
-    anim = create_animation(paths,
-                            colors,
-                            names,
-                            A_,
-                            c_,
-                            figsize=(12, 7),
-                            #x_lim=(-1., 2.),
-                            #y_lim=(-1., 2.1),
-                            n_seconds=10)
-
-    anim.save("result.gif")
+    compare(["OGD", "nOGD"])
+    compare(["FTRL", "nFTRL"])
+    compare(["nKT"])
+    compare(["Ada_Grad", "nAda_Grad"])
     
     # compares all
     #compare(["OGD", "nOGD","FTRL", "nFTRL","Ada_Grad", "nAda_Grad"])
+    
+    #A_, c_, xy_, path_KT = run_optimization("nKT")
+    
+    #_, _, _ ,path_nOGD = run_optimization("nOGD")
+    #_, _, _ ,path_OGD = run_optimization("OGD")
+    #_, _, _ ,path_nFTRL = run_optimization("nFTRL")
+    #_, _, _ ,path_FTRL = run_optimization("FTRL")
+    #_, _, _ ,path_Ada = run_optimization("Ada_Grad")
+    #_, _, _ ,path_nAda = run_optimization("nAda_Grad")
+    #freq = 1
+
+    #paths = [path_nOGD[::freq], path_KT[::freq],path_OGD[::freq], path_nFTRL[::freq], path_FTRL[::freq], path_nAda[::freq], path_Ada[::freq]]
+    
+    #colors = ["green", "royalblue", "black", "lightcoral", "purple", "red", "pink"]
+    #names = ["nOGD", "nKT", "OGD", "nFTRL", "FTRL", "nAda", "Ada"] 
+    #anim = create_animation(paths,
+    #                        colors,
+    #                        names,
+    #                        A_,
+    #                        c_,
+    #                        figsize=(12, 7),
+    #                        #x_lim=(-1., 2.),
+    #                        #y_lim=(-1., 2.1),
+    #                        n_seconds=10)
+
+    #anim.save("result.gif")
+    
+    
