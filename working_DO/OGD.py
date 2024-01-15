@@ -4,7 +4,6 @@ import numpy as np
 import torch
 from torch.optim.optimizer import Optimizer
 
-# mary poppins
 class OGD(Optimizer):
     r"""Implements Online Gradient Descent Algorithm with constant learning rate alpha/sqrt(T)
     version of ML Book Chapter 2.
