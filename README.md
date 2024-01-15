@@ -6,7 +6,7 @@ The file on_test.py implements methods to run an optimiziation, compare differen
 
 # Implemtation of Algorithm
 
-This project implements three different Algorithms and their normalized version. 
+This project implements three different Algorithms and their normalized version found in ["Normaliezed Gradients for ALL"](https://arxiv.org/abs/2308.05621) by F. Orabano and ["Online to Offline Conversions, Universality and Adaptive Minibatch Sizes"](https://arxiv.org/abs/1705.10499) by K.Y. Levy. 
 The Implemenation is done using pyorch. Everey optimizer has is own file using the framework of the pytorch-OptimizerClass.
 
 # Test File
