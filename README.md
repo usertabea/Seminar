@@ -1,24 +1,25 @@
 # Seminar
 ## Seminar Project
 
-Implementation of different algorithms and their normaliziation counterparts in the pytorch framework.
-The file on_test.py implements methods to run an optimiziation, compare different optimizers and hopefully shows an nice example.
+Implementation of different algorithms and their normalized counterparts in the pytorch framework.
+The file on_test.py implements methods to run an optimization, compare different optimizers and hopefully shows a nice example.
 
-# Implemtation of Algorithm
+# Implementation of the algorithm
 
-This project implements three different Algorithms and their normalized version found in ["Normaliezed Gradients for ALL"](https://arxiv.org/abs/2308.05621) by F. Orabano and ["Online to Offline Conversions, Universality and Adaptive Minibatch Sizes"](https://arxiv.org/abs/1705.10499) by K.Y. Levy. 
-The Implemenation is done using pyorch. Everey optimizer has is own file using the framework of the pytorch-OptimizerClass.
+This project implements three different algorithms and their normalized version from ["Normalized Gradients for ALL"] (https://arxiv.org/abs/2308.05621) by F. Orabano and ["Online to Offline Conversions, Universality and Adaptive Minibatch Sizes"] (https://arxiv.org/abs/1705.10499) by K.Y. Levy. 
+The implementation is done with Pyorch. Each optimizer has its own file that uses the framework of the pytorch-OptimizerClass.
 
-# Test File
+# Test file
 The methods in on_test are used as
 ```
 run_optimiziation(optimizer, dim, max_iterations, tolerance)
 ```
-to run the optimiziation with the specified optimizer, plots using pyplot and returns an path containing the iterates the optimiziation method generates.
+to run the optimization with the specified optimizer, draws with pyplot and returns a path containing the iterations that the optimization method generates.
 ''' 
-compare(optimzer_1, ..., optimizer_n, dim, max_iterations, tolerance)
+compare(optimizer_1, ..., optimizer_n, dim, max_iterations, tolerance)
 '''
-to compare n different optimizers and show the convergence rates in pyplot. If no dim, number of iteration or tolerance is given, the method uses the default ones.
+to compare n different optimizers and display the convergence rates in pyplot. If no dim, no number of iterations or tolerance is specified, the method uses the default values.
+
 
 # Usage
 ```python
