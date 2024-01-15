@@ -11,9 +11,9 @@ The Implemenation is done using pyorch. Everey optimizer has is own file using t
 
 # Test File
 The methods in on_test are used as
-'''
+```
 run_optimiziation(optimizer, dim, max_iterations, tolerance)
-'''
+```
 to run the optimiziation with the specified optimizer, plots using pyplot and returns an path containing the iterates the optimiziation method generates.
 ''' 
 compare(optimzer_1, ..., optimizer_n, dim, max_iterations, tolerance)
