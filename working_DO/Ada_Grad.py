@@ -1,14 +1,6 @@
-# test 11.1. normalized gradient descent
-# not fail working shit
-# working for ML
 import numpy as np
 import torch
 from torch.optim.optimizer import Optimizer
-#does something right i guess
-# shows zig zagging of GD
-# updates working, just looking shitty
-# furchtbar schnell keine Ahnung ob richtig ;)
-# mary poppins
 
 class Ada_Grad(Optimizer):
     r"""Implements Adaptive Gradient Descent Algorithm (AdaGrad) version of paper
