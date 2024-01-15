@@ -4,8 +4,7 @@
 import numpy as np
 import torch
 from torch.optim.optimizer import Optimizer
-# works 
-# mary poppins
+
 
 class FTRL(Optimizer):
     r"""Implements FTRL algorithm with linearized losses
