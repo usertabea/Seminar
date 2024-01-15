@@ -4,7 +4,7 @@ import numpy as np
 import torch
 
 from torch.optim.optimizer import Optimizer
-# mary poppins
+
 class nOGD(Optimizer):
     r"""Implements normalized Online Gradient Descent Algorithm 
     version of paper and constant learning rate alpha/sqrt(T)
