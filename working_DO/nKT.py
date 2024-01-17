@@ -28,7 +28,7 @@ class nKT(Optimizer):
                 "Invalid weight_decay value: {}".format(weight_decay))
 
         defaults = dict(weight_decay=weight_decay)
-        self._wealth = weight_decay
+        self._wealth = alpha
         self._iter=1
         self._firstep = True
         self._eps = 1e-8
