@@ -222,10 +222,10 @@ if __name__ == "__main__":
 
     num_optimzers = len(temp_input)
     # compares normalized with simple version of the algorithm
-    compare(["Ada_Grad", "nAda_Grad"])
-    compare(["OGD", "nOGD"], 10)
-    compare(["FTRL", "nFTRL"], 10)
-    compare(["nKT"])
+    compare(["Ada_Grad", "nAda_Grad"], 5)
+    compare(["OGD", "nOGD"], 5)
+    compare(["FTRL", "nFTRL"], 5)
+    compare(["nKT"], 5)
     
     
     # compares all
@@ -256,4 +256,3 @@ if __name__ == "__main__":
     #                        #n_seconds=10)
 
     #anim.save("result.gif")
-    
