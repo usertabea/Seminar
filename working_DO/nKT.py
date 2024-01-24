@@ -15,12 +15,11 @@ class nKT(Optimizer):
             parameter groups
         w (float, optional): Initial wealth. Set this number more or less to
         the initial learning rate you would use in Adam or SGD (default 1e-4)
-        weight_decay (float, optional): weight decay (L2 penalty) (default: 0)
     .. _Coin Betting and Parameter-Free Online Learning:
         https://arxiv.org/abs/1602.04128
     """
     # default weight changed from 1e-4 to 1.0
-    def __init__(self, params, alpha: float = 1., weight_decay: float = 0., iter: int = 0):
+    def __init__(self, params, alpha: float = 1., weight_decay: float = 1., iter: int = 0):
         if not 0.0 <= alpha:
             raise ValueError("Invalid w value: {}".format(alpha))
         if not 0.0 <= weight_decay:
@@ -28,8 +27,8 @@ class nKT(Optimizer):
                 "Invalid weight_decay value: {}".format(weight_decay))
 
         defaults = dict(weight_decay=weight_decay)
-        self._wealth = alpha
-        self._iter=1
+        self._wealth = alpha # initial d_0
+        self._iter= 0
         self._firstep = True
         self._eps = 1e-8
         super(nKT, self).__init__(params, defaults)
@@ -48,7 +47,6 @@ class nKT(Optimizer):
         
         for group in self.param_groups:
             weight_decay = group['weight_decay']
-            
             if self._firstep:
                 x0 = group['x0'] = [torch.clone(p).detach() for p in group['params']]
                 theta = group['theta'] = [torch.zeros_like(p).detach() for p in group['params']]
