@@ -171,10 +171,13 @@ def create_animation(paths,
     y = np.linspace(*y_lim, n_points)
     X, Y = np.meshgrid(x, y)
     print([X,Y])
-    Z = quadratic_form_matrix([X,Y], A, c)
+    def f(x):
+        return np.dot(np.dot(x.T,A),x) - np.dot(c,x)
+    #Z = quadratic_form_matrix([X,Y], A, c)
         
     fig, ax = plt.subplots(figsize=figsize)
-    ax.contour(X, Y, Z, 90)
+    plt.contour(x, y, f(x[0:2,:]))
+    #ax.contour(X, Y, Z, 90)
         
     scatters = [ax.scatter(None,
                             None,
