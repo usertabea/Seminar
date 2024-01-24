@@ -36,15 +36,16 @@ def solve_qp_scipy(G, a):
     result = scipy.optimize.minimize(
         f, x0 = np.zeros(len(G)), method='SLSQP', constraints=constraints,
         tol=1e-10, options={'maxiter': 2000})
-   
+    #print(result.x)
     return result.fun, result.x
     
 def get_quadraticForm(n):
     # creates positive semidefinite quadratic (n,n)-matrix, 
     # random (n,1) matrix and random (n,1) "+ 1" initial point 
     
-    # fixed seed for reproducibility
+    # fixed seed for reproducibility s= 5 ada
     seed = 5
+    
     np.random.seed(seed)
     c = np.matrix(2 * np.random.rand(n, 1) - 1)
     
@@ -52,12 +53,25 @@ def get_quadraticForm(n):
     Q, _ = np.linalg.qr(B)
     # U = np.matrix(ortho_group.rvs(dim=n))
     D = np.matrix(np.diagflat(np.random.rand(n)))
-    A = Q.T * D * Q
+    # failsafe 1
+    # failsafe nn of D
+    res_1 = np.all(np.greater_equal(D, 0))
+    if res_1 != True:
+        raise ValueError
+    A = 10*(Q.T * D * Q)
     
-    xy_init = np.ones((n,1))+ np.random.rand(n, 1)
+    # failsafe 2 
+    # checking pd of A
+    res = np.all(np.linalg.eigvals(A) > 0)
+    if res != True:
+        raise ValueError
+    # zero as sartingpoint
+    xy_init = np.zeros((n,1)) 
+    # random 1 + startingpoint
+    # xy_init = np.ones((n,1))+ np.random.rand(n, 1)
     return A, c, xy_init
 
-def compare(optimzer_list, dim = 10,  n_iter = 500, tol = 0.01, **optimizer_kwargs):
+def compare(optimzer_list, dim = 5,  n_iter = 500, tol = 0.01, **optimizer_kwargs):
     # compares optimzers from optimzerlist
     filename = "compare_"
     for i in optimzer_list:
@@ -86,7 +100,7 @@ def compare(optimzer_list, dim = 10,  n_iter = 500, tol = 0.01, **optimizer_kwar
             rel_tol = np.linalg.norm((xy_optimal - xy_t.detach().numpy().flatten())/xy_optimal)
             abs_tol = np.linalg.norm(xy_optimal - xy_t.detach().numpy().flatten())
             inputs.append(t)
-            results.append(rel_tol)
+            results.append(abs_tol)
             # optimality criterion
             if ( (abs_tol<=tol) or(torch.linalg.norm(xy_t.grad)<tol)):
                 print(i, abs_tol)
@@ -96,23 +110,23 @@ def compare(optimzer_list, dim = 10,  n_iter = 500, tol = 0.01, **optimizer_kwar
     # show the plot
     ax = plt.gca()
     #ax.set_xlim([-0.1, 200])
-    ax.set_ylim([0., 1.])
+    #ax.set_ylim([0., 1.])
     plt.legend()
     plt.show()   
     plt.savefig(filename)
     
-def run_optimization(optimizer_, dim = 2, n_iter = 100, tol = 0.01, lr = 1., **optimizer_kwargs):
+def run_optimization(optimizer_, dim = 2, n_iter = 1500, tol = 0.01, lr = 1., **optimizer_kwargs):
     # runs optimiazition for one optimizer
     path = np.empty((n_iter + 1, 2))
     
     optimizer_class = eval(optimizer_)
     A_, c_, xy_init_ = get_quadraticForm(dim)
     _, xy_optimal  = solve_qp_scipy(np.asarray(A_), c_.getA1())
-    print(xy_optimal)
+    #print(xy_optimal)
     xy_t = torch.tensor(xy_init_, requires_grad=True)
     A = torch.tensor(A_)
     c= torch.tensor(c_)   
-    print(xy_init_.flatten())           
+    #print(xy_init_.flatten())           
     path[0, :] = xy_init_.flatten()
     optimizer = optimizer_class([xy_t], iter = n_iter, alpha = lr , **optimizer_kwargs)
     
@@ -135,18 +149,18 @@ def run_optimization(optimizer_, dim = 2, n_iter = 100, tol = 0.01, lr = 1., **o
                 
         if ( (abs_tol<=tol) or(torch.linalg.norm(xy_t.grad)<tol)): # small diff to optimal solution or small diff to grada == 0
            
-            print(optimizer_, abs_tol)
+            #print(optimizer_, abs_tol)
            
             break
         path[t, :] = xy_t.detach().numpy().flatten()
-    print(optimizer_, abs_tol)   
+    #print(optimizer_, abs_tol)   
     plt.plot(inputs, results, label=optimizer_)
     # show the plot
     ax = plt.gca()
     # just interesting part      
     ax.set_ylim([0., 1.])
     plt.legend()
-    plt.show()
+    #plt.show()
     return A_, c_, xy_init_, path
     
    
@@ -157,8 +171,8 @@ def create_animation(paths,
                      A,
                      c,
                      figsize=(12, 12),
-                     x_lim=(-2, 2),
-                     y_lim=(-1, 3),
+                     x_lim=(-1, 2),
+                     y_lim=(-1, 2),
                      n_seconds=10):
     
     if not (len(paths) == len(colors) == len(names)):
@@ -170,13 +184,15 @@ def create_animation(paths,
     x = np.linspace(*x_lim, n_points)
     y = np.linspace(*y_lim, n_points)
     X, Y = np.meshgrid(x, y)
-    print([X,Y])
+    X.shape
+    #print([X,Y])
     def f(x):
-        return np.dot(np.dot(x.T,A),x) - np.dot(c,x)
+        #return np.dot(x, A).dot(x) + np.dot(c, x)
+        return np.dot(np.dot(x.T,A),x) + np.dot(c.T,x)
     #Z = quadratic_form_matrix([X,Y], A, c)
         
     fig, ax = plt.subplots(figsize=figsize)
-    plt.contour(x, y, f(x[0:2,:]))
+    plt.contour(X, Y, f(X[0:2,:]), 120)
     #ax.contour(X, Y, Z, 90)
         
     scatters = [ax.scatter(None,
@@ -206,10 +222,11 @@ if __name__ == "__main__":
 
     num_optimzers = len(temp_input)
     # compares normalized with simple version of the algorithm
-    compare(["OGD", "nOGD"])
-    compare(["FTRL", "nFTRL"])
-    compare(["nKT"])
     compare(["Ada_Grad", "nAda_Grad"])
+    compare(["OGD", "nOGD"], 10)
+    compare(["FTRL", "nFTRL"], 10)
+    compare(["nKT"])
+    
     
     # compares all
     #compare(["OGD", "nOGD","FTRL", "nFTRL","Ada_Grad", "nAda_Grad"])
@@ -233,11 +250,10 @@ if __name__ == "__main__":
     #                        names,
     #                        A_,
     #                        c_,
-    #                        figsize=(12, 7),
+    #                        figsize=(12, 7))
     #                        #x_lim=(-1., 2.),
     #                        #y_lim=(-1., 2.1),
-    #                        n_seconds=10)
+    #                        #n_seconds=10)
 
     #anim.save("result.gif")
-    
     
