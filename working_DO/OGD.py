@@ -4,7 +4,6 @@ import numpy as np
 import torch
 from torch.optim.optimizer import Optimizer
 
-# mary poppins
 class OGD(Optimizer):
     r"""Implements Online Gradient Descent Algorithm with constant learning rate alpha/sqrt(T)
     version of ML Book Chapter 2.
@@ -35,7 +34,7 @@ class OGD(Optimizer):
         # beginning true t=0 
         self._firstep = True
         super(OGD, self).__init__(params, defaults)
-
+    
     @torch.no_grad()
     def step(self, closure = None):
         """Performs a single optimization step.
@@ -72,7 +71,7 @@ class OGD(Optimizer):
                         sum.add_(p.data)
                         # x_t+1 = x_t -alpha/sqrt(T) * g_t
                         p.data.copy_(torch.add(p.data, grad, alpha =  -self._alpha))
-                    # last step for Online/Batch
+                # last step for Online/Batch
                 if  self._step == self._iter +1:
                     # x_T = 1/T * sum x_t 
                     p.data.copy_(torch.mul( sum,  1/self._step))

@@ -1,6 +1,6 @@
-# test 11.1. normalized gradient descent
-# working for ML
+# nAdaGrad
 import numpy as np
+from fractions import Fraction
 import torch
 from torch.optim.optimizer import Optimizer
 
@@ -31,9 +31,17 @@ class nAda_Grad(Optimizer):
         self._eps = 1e-8
         self._iter= iter
         self._step = 1
-        self._grad_norm = 0
+        #self._grad_norm = 0
         super(nAda_Grad, self).__init__(params, defaults)
-
+    def average(self):
+        ''' Returns the weighted average of the iterations before '''
+        for group in self.param_groups:
+            sum_gradients = group['sum_gradients']
+            for p,  sum in zip(group['params'],  sum_gradients):
+                if self._norm_grad != 0. :
+                    # x_T = 1/(sum (1/norm(g_t))) * sum x_t/\norm(g_t) 
+                    return torch.mul( sum, 1/(self._norm_grad))
+                    
     @torch.no_grad()
     def step(self, closure = None):
         """Performs a single optimization step.
@@ -51,11 +59,13 @@ class nAda_Grad(Optimizer):
                 x0 = group['x0'] = [torch.clone(p).detach() for p in group['params']]
                 sum_gradients = group['sum_gradients']= [torch.zeros_like(p).detach() for p in group['params']]
                 self._firstep = False
+                self._norm_grad = 0.
+                
             else:
                 x0 = group['x0']
                 sum_gradients = group['sum_gradients']
-            
-            self._step+= 1
+                
+            self._step += 1
             for p, sum, x in zip(group['params'], sum_gradients, x0):
                 if p.grad is None:
                     continue
@@ -67,21 +77,17 @@ class nAda_Grad(Optimizer):
                     # update maximum range of the gradients
                     # helper for devision
                     # G >= g_t forall t
-                    if torch.linalg.norm(grad).item()!= 0:
+                    if torch.linalg.norm(grad).item() != 0.:
                         if self._G < torch.linalg.norm(grad).item() :
                             self._G =torch.linalg.norm(grad).item()
                         # udpate sum of x_t/norm(g_t)
                         sum.add_(torch.mul(p.data ,1/(torch.linalg.norm(grad).item() **2)  ))
                         # update sum of the 1/norm(g_t)^2
-                        self._norm_grad += 1/(torch.linalg.norm(grad).item() **2 )
+                        self._norm_grad = self._norm_grad+  1/(torch.linalg.norm(grad).item() **2)
                         # alpha = alpha/ sqrt(G**2 + sum norm(g_t))
                         normalized_alpha = self._alpha / (np.sqrt((self._G**2 +self._norm_grad)))
                         # x_t+1 = x_t - alpha/(sqrt(G**2 + sum norm(g_t)) * g_hat
                         p.data.copy_(torch.add(p.data, g_hat, alpha = - normalized_alpha))
-                    # x_T weighted average levy 2017
-                    if  self._step == self._iter  :
-                        if self._grad_norm!=0:
-                            # x_T = 1/(sum (1/norm(g_t))) * sum x_t/\norm(g_t) 
-                            p.data.copy_(torch.mul( sum,  1/self._grad_norm))
-                
+                        
+                                            
         return loss

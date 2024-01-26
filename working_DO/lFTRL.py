@@ -29,14 +29,14 @@ class FTRL(Optimizer):
         # static paramters
         self._alpha = alpha
         self._iter = iter
-        self._step = 0
+        self._step = 1
         self._eps = 1e-8
         self._grad_norm = 0
         # beginning true t=0 
         self._firstep = True
         
         super(FTRL, self).__init__(params, defaults)
-
+    
     @torch.no_grad()
     def step(self, closure = None):
         """Performs a single optimization step.
@@ -54,23 +54,23 @@ class FTRL(Optimizer):
                 # x_0 t_0...
                 sum_gradients = group['sum_gradients'] = [torch.zeros_like(p).detach() for p in group['params']]
                 x0 = group['x0'] = [torch.clone(p).detach() for p in group['params']]                  
+                sum_x_t = group['sum_x_t']= [torch.zeros_like(p).detach() for p in group['params']]
                 self._firstep = False
                 
             else:
                 sum_gradients = group['sum_gradients'] 
+                sum_x_t = group['sum_x_t']
                 x0 = group['x0']
             self._step+=1
-            for p, sum in zip(group['params'], sum_gradients):
+            for p, sum , x in zip(group['params'], sum_gradients, sum_x_t):
                 if p.grad is None:
                     continue
                 else:
                     grad = p.grad
-                    if (torch.linalg.norm(grad).item()!=0):
+                    if (torch.linalg.norm(grad).item()!=0.0):
                         # udpate sum of g_t 
                         sum.add_(grad)
                         # x_t+1 = x_t - alpha/sqrt(t) * g_t
-                        p.data.copy_( torch.mul(sum,  - self._alpha/ (np.sqrt(self._step))))
-                        # projection step
-                        #if (torch.linalg.norm(p.data).item())>0:
-                        p.data.copy_(torch.mul(p.data, min(1, 1/(torch.linalg.norm(p.data).item()))))      
+                        p.data.copy_( (torch.mul(sum,  - self._alpha/ (np.sqrt(self._step)))))
+                        x.add_(p.data)
         return loss

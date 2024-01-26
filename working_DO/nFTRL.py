@@ -1,11 +1,7 @@
-# test 11.1. FTRL
-# example 7.11 / update from paper  linearized loss 
-# working for ML
+# nFTRL
 import numpy as np
 import torch
 from torch.optim.optimizer import Optimizer
-# works 
-# mary poppins
 
 class nFTRL(Optimizer):
     r"""Implements normalized FTRL algorithm with linearized losses
@@ -35,7 +31,15 @@ class nFTRL(Optimizer):
         self._firstep = True
         
         super(nFTRL, self).__init__(params, defaults)
-
+    def average(self):
+        ''' Returns the weighted average of the iterations before '''
+        for group in self.param_groups:
+            sum_normed_x_t = group['sum_normed_x_t']
+            for p,  x_t in zip(group['params'],  sum_normed_x_t):
+                # weighted average
+                if self._grad_norm!=0:
+                    # x_T = 1/(sum (1/norm(g_t))) * sum x_t/\norm(g_t) 
+                    return torch.mul( x_t,  1/self._grad_norm)                   
     @torch.no_grad()
     def step(self, closure = None):
         """Performs a single optimization step.
@@ -53,19 +57,23 @@ class nFTRL(Optimizer):
                 # x_0 t_0..
                 sum_gradients = group['sum_gradients'] = [torch.zeros_like(p).detach() for p in group['params']]
                 x0 = group['x0'] = [torch.clone(p).detach() for p in group['params']]                  
+                sum_normed_x_t = group['sum_normed_x_t'] = [torch.zeros_like(p).detach() for p in group['params']]
                 self._firstep = False
                 
             else:
                 sum_gradients = group['sum_gradients'] 
+                sum_normed_x_t = group['sum_normed_x_t'] 
                 x0 = group['x0']
                 
             self._step+=1
-            for p, sum, x in zip(group['params'], sum_gradients, x0):
+            for p, sum, x_t in zip(group['params'], sum_gradients, sum_normed_x_t):
                 if p.grad is None:
                     continue
                 else:
                     grad = p.grad
                     if torch.linalg.norm(grad).item()> 0:
+                        # update sum of x_t/norm(g_t)
+                        x_t.add_(p.data/(torch.linalg.norm(grad).item() ))
                         # update sum of the 1/norms of the gradients
                         self._grad_norm += 1 /(torch.linalg.norm(grad).item() )
                         # g_t/norm(g_t)
@@ -74,10 +82,5 @@ class nFTRL(Optimizer):
                         sum.add_(g_hat)
                         # x_t+1 =  - alpha/sqrt(t) * sum_i g_i/norm(g_i)
                         p.data.copy_(torch.mul(sum, - self._alpha/ (np.sqrt(self._step) )))
-                        # projection step
-                        if (torch.linalg.norm(grad).item())>0:   
-                           p.data.copy_(torch.mul(p.data, min(1, 1/(torch.linalg.norm(grad).item()))))
-                        #if (torch.linalg.norm(p.data).item())>0:
-                        #    p.data.copy_(torch.mul(p.data, min(1, 1/(torch.linalg.norm(p.data).item()))))  
-                        
+                              
         return loss

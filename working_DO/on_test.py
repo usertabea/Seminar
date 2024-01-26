@@ -43,77 +43,100 @@ def get_quadraticForm(n):
     # creates positive semidefinite quadratic (n,n)-matrix, 
     # random (n,1) matrix and random (n,1) "+ 1" initial point 
     
-    # fixed seed for reproducibility s= 5 ada
+    # fixed seed for reproducibility 
+    # can be comment out if you want to plot different examples for the same dimension
     seed = 5
-    
     np.random.seed(seed)
+    
     c = np.matrix(2 * np.random.rand(n, 1) - 1)
     
     B = np.matrix(np.random.rand(n,n))
     Q, _ = np.linalg.qr(B)
-    # U = np.matrix(ortho_group.rvs(dim=n))
+    
     D = np.matrix(np.diagflat(np.random.rand(n)))
     # failsafe 1
-    # failsafe nn of D
+    # failsafe non-negative values of D
     res_1 = np.all(np.greater_equal(D, 0))
     if res_1 != True:
         raise ValueError
     A = 10*(Q.T * D * Q)
     
     # failsafe 2 
-    # checking pd of A
+    # checking positive semidefiniteness of A
     res = np.all(np.linalg.eigvals(A) > 0)
     if res != True:
         raise ValueError
-    # zero as sartingpoint
-    xy_init = np.zeros((n,1)) 
-    # random 1 + startingpoint
-    # xy_init = np.ones((n,1))+ np.random.rand(n, 1)
+    # zero as strtingpoint
+    # xy_init = np.zeros((n,1)) 
+    # random 1 + \varepsilon asstartingpoint
+    xy_init = np.ones((n,1))+ np.random.rand(n, 1)
     return A, c, xy_init
 
 def compare(optimzer_list, dim = 5,  n_iter = 500, tol = 0.01, **optimizer_kwargs):
     # compares optimzers from optimzerlist
-    filename = "compare_"
+    filename = ""
+    colors = ['#377eb8', '#ff7f00', '#4daf4a',
+                  '#f781bf', '#a65628', '#984ea3',
+                  '#999999', '#e41a1c', '#dede00']
+    j = 0
     for i in optimzer_list:
-        filename+= "_" + i
+        filename+= " " + i +","
         optimizer_class = eval(i)
-            
+        # finding optimum and transformation in tensors
         A_, c_, xy_init_ = get_quadraticForm(dim)
         _, xy_optimal  = solve_qp_scipy(np.asarray(A_), c_.getA1())
-              
         xy_t = torch.tensor(xy_init_, requires_grad=True)
         optimizer = optimizer_class([xy_t], iter = n_iter , **optimizer_kwargs)
         A = torch.tensor(A_)
         c= torch.tensor(c_)
+        # storing results
         inputs=[]
         results =[]
         
         for t in tqdm(range(1, n_iter + 1)):
             optimizer.zero_grad()
-                
+            
             loss =quadratic_form(xy_t,A, c)
                 
             loss.backward()
             # performes optimiziation step
             optimizer.step()
             # quality control
-            rel_tol = np.linalg.norm((xy_optimal - xy_t.detach().numpy().flatten())/xy_optimal)
-            abs_tol = np.linalg.norm(xy_optimal - xy_t.detach().numpy().flatten())
+            # averages of \bar{x}_T
+            if (i in  ["nFTRL" ,"nOGD" ,"nAda_Grad" , "Ada_Grad"]):
+                abs_tol = np.linalg.norm( xy_optimal - optimizer.average().detach().numpy().flatten())
+            # quality control
+            else: 
+                abs_tol = np.linalg.norm(xy_optimal - xy_t.detach().numpy().flatten())
+
             inputs.append(t)
             results.append(abs_tol)
+        
             # optimality criterion
+            # absulute tolarance and small gradient
             if ( (abs_tol<=tol) or(torch.linalg.norm(xy_t.grad)<tol)):
                 print(i, abs_tol)
                 break
         print(i, abs_tol)
-        plt.plot(inputs, results, label=i)
+        # plot with legends
+        if i=="OGD":
+            plt.plot(inputs, results, label=i+" "+ r"$\alpha$=1.0", color = colors[j])
+        else: 
+            plt.plot(inputs, results, label=i, color = colors[j], alpha =0.7)
+            
+        j+=1
     # show the plot
     ax = plt.gca()
+    plt.title("Comparing "+ filename[:-1] +"\n dim = "+ str(dim))
     #ax.set_xlim([-0.1, 200])
-    #ax.set_ylim([0., 1.])
+    ax.set_xlabel('# of iterations')
+    ax.set_ylabel('absulute difference\n'r'$\| x^{*}-\bar{x}_{t}\|_{2}$')
+    # just interesting part
+    ax.set_ylim([0., 1.])
     plt.legend()
     plt.show()   
-    plt.savefig(filename)
+    plt.savefig(filename[:-1])
+    plt.close()
     
 def run_optimization(optimizer_, dim = 2, n_iter = 1500, tol = 0.01, lr = 1., **optimizer_kwargs):
     # runs optimiazition for one optimizer
@@ -139,28 +162,29 @@ def run_optimization(optimizer_, dim = 2, n_iter = 1500, tol = 0.01, lr = 1., **
         loss.backward()
                 
         optimizer.step()
-        
-        rel_tol = np.linalg.norm((xy_optimal - xy_t.detach().numpy().flatten())/xy_optimal)
-        abs_tol = np.linalg.norm(xy_optimal - xy_t.detach().numpy().flatten())
-        
+        # quality control
+        # averages of \bar{x}_T
+        if (optimizer_ in  ["nFTRL" ,"nOGD" ,"nAda_Grad" , "Ada_Grad"]):
+            abs_tol = np.linalg.norm( xy_optimal - optimizer.average().detach().numpy().flatten())
+        # quality control
+        else: 
+            abs_tol = np.linalg.norm(xy_optimal - xy_t.detach().numpy().flatten())
+
         inputs.append(t)
-        results.append(rel_tol)
-                
-                
+        results.append(abs_tol)
+         
         if ( (abs_tol<=tol) or(torch.linalg.norm(xy_t.grad)<tol)): # small diff to optimal solution or small diff to grada == 0
-           
-            #print(optimizer_, abs_tol)
            
             break
         path[t, :] = xy_t.detach().numpy().flatten()
-    #print(optimizer_, abs_tol)   
+ 
     plt.plot(inputs, results, label=optimizer_)
     # show the plot
     ax = plt.gca()
     # just interesting part      
     ax.set_ylim([0., 1.])
     plt.legend()
-    #plt.show()
+    plt.show()
     return A_, c_, xy_init_, path
     
    
@@ -187,22 +211,19 @@ def create_animation(paths,
     X.shape
     #print([X,Y])
     def f(x):
-        #return np.dot(x, A).dot(x) + np.dot(c, x)
-        return np.dot(np.dot(x.T,A),x) + np.dot(c.T,x)
-    #Z = quadratic_form_matrix([X,Y], A, c)
         
+        return np.dot(np.dot(x.T,A),x) + np.dot(c.T,x)
+    
     fig, ax = plt.subplots(figsize=figsize)
     plt.contour(X, Y, f(X[0:2,:]), 120)
-    #ax.contour(X, Y, Z, 90)
-        
+     
     scatters = [ax.scatter(None,
                             None,
                             label=label,
                             c=c) for c, label in zip(colors, names)]
 
     ax.legend(prop={"size": 25})
-    #ax.plot(*minimum, "rD", color = "black")
-    #ax.plot(*start, "rD", color ="black")
+   
     def animate(i):
         for path, scatter in zip(paths, scatters):
             scatter.set_offsets(path[:i, :])
@@ -219,20 +240,20 @@ def create_animation(paths,
 if __name__ == "__main__":
     n = 2
     temp_input =[n, "OGD",  "nOGD" ,  "nAda_Grad", "Ada_Grad" , "FTRL" , "nFTRL" , "nKT"]
-
+    k = 10
     num_optimzers = len(temp_input)
     # compares normalized with simple version of the algorithm
-    compare(["Ada_Grad", "nAda_Grad"], 5)
-    compare(["OGD", "nOGD"], 5)
-    compare(["FTRL", "nFTRL"], 5)
-    compare(["nKT"], 5)
-    
+    #compare(["Ada_Grad", "nAda_Grad"], k)
+   
+    #compare(["nOGD", "OGD"], k)
+    #compare(["nFTRL", "FTRL"], k)
+    #compare(["nKT"], k)
     
     # compares all
-    #compare(["OGD", "nOGD","FTRL", "nFTRL","Ada_Grad", "nAda_Grad"])
+    #compare(["OGD", "nOGD","FTRL", "nFTRL","Ada_Grad", "nAda_Grad", "nKT"], k)
     
+    # Runs single optimiziation for animation
     #A_, c_, xy_, path_KT = run_optimization("nKT")
-    
     #_, _, _ ,path_nOGD = run_optimization("nOGD")
     #_, _, _ ,path_OGD = run_optimization("OGD")
     #_, _, _ ,path_nFTRL = run_optimization("nFTRL")
@@ -256,3 +277,4 @@ if __name__ == "__main__":
     #                        #n_seconds=10)
 
     #anim.save("result.gif")
+    

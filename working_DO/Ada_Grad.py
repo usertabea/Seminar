@@ -1,14 +1,8 @@
-# test 11.1. normalized gradient descent
-# not fail working shit
-# working for ML
+# AdaGrad
 import numpy as np
 import torch
 from torch.optim.optimizer import Optimizer
-#does something right i guess
-# shows zig zagging of GD
-# updates working, just looking shitty
-# furchtbar schnell keine Ahnung ob richtig ;)
-# mary poppins
+
 
 class Ada_Grad(Optimizer):
     r"""Implements Adaptive Gradient Descent Algorithm (AdaGrad) version of paper
@@ -36,7 +30,14 @@ class Ada_Grad(Optimizer):
         self._G = 1e-8
         self._iter= iter
         super(Ada_Grad, self).__init__(params, defaults)
-
+    
+    def average(self):
+        ''' Returns the average of the iterations before '''
+        for group in self.param_groups:
+            sum_x_t = group['sum_x_t']
+            for p, sum_x_t in zip(group['params'], sum_x_t):
+                return torch.mul(sum_x_t, 1/(self._step))
+        #return  
     @torch.no_grad()
     def step(self, closure = None):
         """Performs a single optimization step.
@@ -53,13 +54,14 @@ class Ada_Grad(Optimizer):
             if self._firstep:
                 x0 = group['x0'] = [torch.clone(p).detach() for p in group['params']]
                 sum_gradients = group['sum_gradients']= [torch.zeros_like(p).detach() for p in group['params']]
-                
+                sum_x_t = group['sum_x_t']= [torch.zeros_like(p).detach() for p in group['params']]
                 self._firstep = False
             else:
                 x0 = group['x0']
+                sum_x_t = group['sum_x_t']
                 sum_gradients = group['sum_gradients']
             self._step+=1
-            for p, sum, x in zip(group['params'], sum_gradients, x0):
+            for p, sum, x_t in zip(group['params'], sum_gradients, sum_x_t):
                 if p.grad is None:
                     continue
                 else:
@@ -79,9 +81,6 @@ class Ada_Grad(Optimizer):
                         normalized_alpha = self._alpha / (np.sqrt((self._G**2 +self._norm_grad)))
                         # x_t+1 = x_t - alpha/(sqrt(G**2 + sum norm(g_t)) * sum g_t
                         p.data.copy_(torch.add(p.data, grad, alpha = - normalized_alpha))   
-                    #if  self._step == self._iter -1 :
-                    #    # weighted average
-                    #    if self._grad_norm!=0:
-                    #        # x_T = 1/(sum (1/norm(g_t))) * sum x_t/\norm(g_t) 
-                    #        p.data.copy_(torch.mul( sum,  1/self._grad_norm))    
+                        x_t.add_(p.data)
+                   
         return loss

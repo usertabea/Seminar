@@ -37,7 +37,15 @@ class nOGD(Optimizer):
         self._iter= iter
         super(nOGD, self).__init__(params, defaults)
     
-                   
+    def average(self):
+        ''' Returns the weighted average of the iterations before'''
+        for group in self.param_groups:
+            sum_gradients = group['sum_gradients']
+            for p, sum in zip(group['params'], sum_gradients):
+                # weighted average
+                if self._grad_norm!=0:
+                    # x_T = 1/(sum (1/norm(g_t))) * sum x_t/\norm(g_t) 
+                    return torch.mul( sum,  1/self._grad_norm)
     @torch.no_grad()
     def step(self, closure = None):
         """Performs a single optimization step.
@@ -75,10 +83,5 @@ class nOGD(Optimizer):
                         p.data.copy_(torch.add(p.data, g_hat, alpha = - self._alpha))
                         # udpate sum of x_t / norm(g_t)
                         sum.add_(p.data/(torch.linalg.norm(grad).item()))
-                    if  self._step == self._iter -1 :
-                        # weighted average
-                        if self._grad_norm!=0:
-                            # x_T = 1/(sum (1/norm(g_t))) * sum x_t/\norm(g_t) 
-                            p.data.copy_(torch.mul( sum,  1/self._grad_norm))
-                    
+                   
         return loss
