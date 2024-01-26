@@ -1,5 +1,4 @@
-# test 28.11.  online gradient descent
-# working for ML
+# OGD 
 import numpy as np
 import torch
 from torch.optim.optimizer import Optimizer

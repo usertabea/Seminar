@@ -5,7 +5,7 @@ from torch.optim.optimizer import Optimizer
 
 class nFTRL(Optimizer):
     r"""Implements normalized FTRL algorithm with linearized losses
-    version of ML 2019 Orabano Chapter 7 
+    version of ML 2019 Orabano Chapter 7.
     Arguments:
         params (iterable): iterable of parameters to optimize or dicts defining
             parameter groups

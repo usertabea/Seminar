@@ -37,7 +37,7 @@ class Ada_Grad(Optimizer):
             sum_x_t = group['sum_x_t']
             for p, sum_x_t in zip(group['params'], sum_x_t):
                 return torch.mul(sum_x_t, 1/(self._step))
-        #return  
+          
     @torch.no_grad()
     def step(self, closure = None):
         """Performs a single optimization step.
@@ -65,13 +65,13 @@ class Ada_Grad(Optimizer):
                 if p.grad is None:
                     continue
                 else:
-                    # update the sum of the negative gradients and the weights
                     grad = p.grad
                     # update maximum range of the gradients
                     # helper for devision
                     # G >= g_t forall t
                     if self._G < torch.linalg.norm(grad).item() :
                             self._G =torch.linalg.norm(grad).item()
+                    # update the sum of the negative gradients and the weights
                     if torch.linalg.norm(grad).item()!=0:
                         # udpate sum of x_t
                         sum.add_(p.data)

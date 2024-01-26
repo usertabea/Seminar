@@ -1,37 +1,23 @@
-# Copyright (c) Francesco Orabona.
-# All rights reserved.
-# 11.1.
-# This source code is licensed under the license found in the
-# LICENSE file in the root directory of this source tree.
+# nKT
 
 import torch
 from torch.optim.optimizer import Optimizer
 
 class nKT(Optimizer):
     r"""Implements the normalized KT algorithm from 'Normalized Gradients for ALL' by Orabano.
-    It has been proposed in `Coin Betting and Parameter-Free Online Learning`_.
-    Arguments:
         params (iterable): iterable of parameters to optimize or dicts defining
             parameter groups
-        w (float, optional): Initial wealth. Set this number more or less to
-        the initial learning rate you would use in Adam or SGD (default 1e-4)
-    .. _Coin Betting and Parameter-Free Online Learning:
-        https://arxiv.org/abs/1602.04128
+        alpha (float, optional): Initial wealth d_0. Best between 1 and sqrt(T)
     """
-    # default weight changed from 1e-4 to 1.0
-    def __init__(self, params, alpha: float = 1., weight_decay: float = 1., iter: int = 0):
+    def __init__(self, params, alpha: float = 1., iter: int = 0):
         if not 0.0 <= alpha:
-            raise ValueError("Invalid w value: {}".format(alpha))
-        if not 0.0 <= weight_decay:
-            raise ValueError(
-                "Invalid weight_decay value: {}".format(weight_decay))
+            raise ValueError("Invalid d_0 value: {}".format(alpha))
 
-        defaults = dict(weight_decay=weight_decay)
         self._wealth = alpha # initial d_0
         self._iter= 0
         self._firstep = True
         self._eps = 1e-8
-        super(nKT, self).__init__(params, defaults)
+        super(nKT, self).__init__(params)
 
     @torch.no_grad()
     def step(self, closure = None):

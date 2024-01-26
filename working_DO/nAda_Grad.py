@@ -7,7 +7,8 @@ from torch.optim.optimizer import Optimizer
 
 class nAda_Grad(Optimizer):
     r"""Implements normalized Adaptive Gradient Descent Algorithm (nAdaGrad) version of paper 
-    "Normalized Gradients for All" by Orabano
+    "Online to Offline Conversions, Universality and
+    Adaptive Minibatch Sizes" by Levy
     Arguments:
         params (iterable): iterable of parameters to optimize or dicts defining
             parameter groups
