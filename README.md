@@ -15,10 +15,10 @@ The methods in on_test are used as
 run_optimiziation(optimizer, dim, max_iterations, tolerance)
 ```
 to run the optimization with the specified optimizer, draws with pyplot and returns a path containing the iterations that the optimization method generates.
-''' 
-compare(optimizer_1, ..., optimizer_n, dim, max_iterations, tolerance)
-'''
-to compare n different optimizers and display the convergence rates in pyplot. If no dim, no number of iterations or tolerance is specified, the method uses the default values.
+```
+compare([optimizer_1, ..., optimizer_n], dim, max_iterations, tolerance)
+```
+to compare n different optimizers and display the absulute difference to the optimal point in pyplot. If no dim, no number of iterations or tolerance is specified, the method uses the default values.
 
 
 # Usage
