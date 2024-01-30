@@ -12,12 +12,12 @@ class nKT(Optimizer):
     def __init__(self, params, alpha: float = 1., iter: int = 0):
         if not 0.0 <= alpha:
             raise ValueError("Invalid d_0 value: {}".format(alpha))
-
+        defaults = dict(alpha=alpha)
         self._wealth = alpha # initial d_0
         self._iter= 0
         self._firstep = True
         self._eps = 1e-8
-        super(nKT, self).__init__(params)
+        super(nKT, self).__init__(params, defaults)
 
     @torch.no_grad()
     def step(self, closure = None):
@@ -32,7 +32,7 @@ class nKT(Optimizer):
                 loss = closure()
         
         for group in self.param_groups:
-            weight_decay = group['weight_decay']
+           
             if self._firstep:
                 x0 = group['x0'] = [torch.clone(p).detach() for p in group['params']]
                 theta = group['theta'] = [torch.zeros_like(p).detach() for p in group['params']]

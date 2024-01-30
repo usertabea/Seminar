@@ -1,11 +1,7 @@
-# test 11.1. FTRL
-# example 7.11 / update from paper  linearized loss 
-# working for ML
+# FTRL
 import numpy as np
 import torch
 from torch.optim.optimizer import Optimizer
-# works 
-# mary poppins
 
 class FTRL(Optimizer):
     r"""Implements FTRL algorithm with linearized losses
