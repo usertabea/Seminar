@@ -7,7 +7,7 @@ The file on_test.py implements methods to run an optimization for specific optim
 # Implementation of the algorithm
 
 This project implements three different algorithms and their normalized version from ["Normalized Gradients for ALL"] (https://arxiv.org/abs/2308.05621) by F. Orabano and ["Online to Offline Conversions, Universality and Adaptive Minibatch Sizes"] (https://arxiv.org/abs/1705.10499) by K.Y. Levy. 
-The implementation is done with ![PyTorch Logo](https://github.com/pytorch/pytorch/raw/master/docs/source/_static/img/pytorch-logo-dark.png). Each optimizer has its own file that uses the framework of the pytorch-OptimizerClass.
+The implementation is done with ![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white). Each optimizer has its own file that uses the framework of the pytorch-OptimizerClass.
 
 # Test file
 The methods in on_test are used as
