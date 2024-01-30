@@ -2,12 +2,12 @@
 ## Seminar Project
 
 Implementation of different algorithms and their normalized counterparts in the pytorch framework.
-The file on_test.py implements methods to run an optimization, compare different optimizers and hopefully shows a nice example.
+The file on_test.py implements methods to run an optimization for specific optimizer, compare different optimizers and shows a nice example.
 
 # Implementation of the algorithm
 
 This project implements three different algorithms and their normalized version from ["Normalized Gradients for ALL"] (https://arxiv.org/abs/2308.05621) by F. Orabano and ["Online to Offline Conversions, Universality and Adaptive Minibatch Sizes"] (https://arxiv.org/abs/1705.10499) by K.Y. Levy. 
-The implementation is done with Pyorch. Each optimizer has its own file that uses the framework of the pytorch-OptimizerClass.
+The implementation is done with ![PyTorch Logo](https://github.com/pytorch/pytorch/raw/master/docs/source/_static/img/pytorch-logo-dark.png). Each optimizer has its own file that uses the framework of the pytorch-OptimizerClass.
 
 # Test file
 The methods in on_test are used as
