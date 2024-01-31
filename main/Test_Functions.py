@@ -54,7 +54,6 @@ def quadratic_form_matrix(xy, A, c):
     x, y = xy
     # extreme ugly
     return x**2 * A[0][0]+x*y*A[0][1] + x*y*A[1][0] + y**2 *A[1][1] + x*c[0][0]+y*c[0][1]
-    #return (xy.T.dot(A)@xy  + c.T.dot(xy)).item(0)
 
 def ackley_tens(xy):
     """Evaluate Ackley function for Tensors.
