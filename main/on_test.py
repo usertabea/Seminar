@@ -187,55 +187,6 @@ def run_optimization(optimizer_, dim = 2, n_iter = 1500, tol = 0.01, lr = 1., **
     plt.show()
     return A_, c_, xy_init_, path
     
-   
-            
-def create_animation(paths,
-                     colors,
-                     names,
-                     A,
-                     c,
-                     figsize=(12, 12),
-                     x_lim=(-1, 2),
-                     y_lim=(-1, 2),
-                     n_seconds=10):
-    
-    if not (len(paths) == len(colors) == len(names)):
-        raise ValueError
-
-    path_length = max(len(path) for path in paths)
-
-    n_points = 300
-    x = np.linspace(*x_lim, n_points)
-    y = np.linspace(*y_lim, n_points)
-    X, Y = np.meshgrid(x, y)
-    X.shape
-    #print([X,Y])
-    def f(x):
-        
-        return np.dot(np.dot(x.T,A),x) + np.dot(c.T,x)
-    
-    fig, ax = plt.subplots(figsize=figsize)
-    plt.contour(X, Y, f(X[0:2,:]), 120)
-     
-    scatters = [ax.scatter(None,
-                            None,
-                            label=label,
-                            c=c) for c, label in zip(colors, names)]
-
-    ax.legend(prop={"size": 25})
-   
-    def animate(i):
-        for path, scatter in zip(paths, scatters):
-            scatter.set_offsets(path[:i, :])
-
-        ax.set_title(str(i))
-
-    ms_per_frame = 1000 * n_seconds / path_length
-
-    anim = FuncAnimation(fig, animate, frames=path_length, interval=ms_per_frame)
-
-    return anim
-
 
 if __name__ == "__main__":
     n = 2
@@ -259,21 +210,4 @@ if __name__ == "__main__":
     #_, _, _ ,path_FTRL = run_optimization("FTRL")
     #_, _, _ ,path_Ada = run_optimization("Ada_Grad")
     #_, _, _ ,path_nAda = run_optimization("nAda_Grad")
-    #freq = 1
-
-    #paths = [path_nOGD[::freq], path_KT[::freq],path_OGD[::freq], path_nFTRL[::freq], path_FTRL[::freq], path_nAda[::freq], path_Ada[::freq]]
-    
-    #colors = ["green", "royalblue", "black", "lightcoral", "purple", "red", "pink"]
-    #names = ["nOGD", "nKT", "OGD", "nFTRL", "FTRL", "nAda", "Ada"] 
-    #anim = create_animation(paths,
-    #                        colors,
-    #                        names,
-    #                        A_,
-    #                        c_,
-    #                        figsize=(12, 7))
-    #                        #x_lim=(-1., 2.),
-    #                        #y_lim=(-1., 2.1),
-    #                        #n_seconds=10)
-
-    #anim.save("result.gif")
     
