@@ -12,7 +12,7 @@ import getopt, sys
 import scipy.optimize
 import scipy.stats
 
-# import of optimzer classes
+# import of optimizer classes
 from nKT import nKT
 from nAda_Grad import nAda_Grad
 from nOGD import nOGD
