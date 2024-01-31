@@ -4,7 +4,7 @@
 Implementation of different algorithms and their normalized counterparts in the pytorch framework.
 The file on_test.py implements methods to run an optimization for specific optimizer, compare different optimizers and shows a nice example.
 
-# Implementation of the algorithm
+# Implementation of the algorithms
 
 This project implements three different algorithms and their normalized version from ["Normalized Gradients for ALL"] (https://arxiv.org/abs/2308.05621) by F. Orabano and ["Online to Offline Conversions, Universality and Adaptive Minibatch Sizes"] (https://arxiv.org/abs/1705.10499) by K.Y. Levy and the normalized version of the KT-Bettor from ["Coin Betting and Parameter-Free Online Learning"](https://arxiv.org/abs/1602.04128) by F.Orabano and D. Pál.
 The implementation is done with ![PyTorch](https://pytorch.org/). Each optimizer has its own file, that uses the framework of the pytorch-OptimizerClass.
